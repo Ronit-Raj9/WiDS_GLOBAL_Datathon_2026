@@ -1,0 +1,5 @@
+analysis,status,details
+km_overall,ok,median_survival=66.92046277222222
+km_dist_min_ci_bin,ok,"first_two_groups=(306.954, 5762.403] vs (131892.488, 757700.487], p=3.81628e-33"
+km_alignment_abs_bin,ok,insufficient group count for log-rank
+km_num_perimeters_bin,ok,"first_two_groups=<=1 vs 2-3, p=1.88342e-07"

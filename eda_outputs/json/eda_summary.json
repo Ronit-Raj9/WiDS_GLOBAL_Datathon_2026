@@ -1,0 +1,25 @@
+{
+  "script": "eda.py",
+  "dataset": {
+    "train_rows": 221,
+    "test_rows": 95,
+    "raw_feature_count": 34,
+    "engineered_feature_count": 21
+  },
+  "target": {
+    "event_rate": 0.31221719457013575,
+    "censor_rate": 0.6877828054298643,
+    "time_min": 0.0012202119444444,
+    "time_max": 66.99447413277778
+  },
+  "schema_ok": true,
+  "tools": {
+    "seaborn": true,
+    "scipy": true,
+    "lifelines": true
+  },
+  "outputs": {
+    "tables_dir": "eda_outputs/tables",
+    "figures_dir": "eda_outputs/figures"
+  }
+}

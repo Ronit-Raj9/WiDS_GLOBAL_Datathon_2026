@@ -1,0 +1,5 @@
+check,mean_abs_diff,max_abs_diff
+relative_growth_vs_area_growth_rel,0.0,0.0
+projected_advance_vs_negative_dist_change,0.0,0.0
+closing_speed_abs_consistency,0.0,0.0
+bearing_sin_cos_unit_circle,1.1554357269854571e-17,4.440892098500626e-16
