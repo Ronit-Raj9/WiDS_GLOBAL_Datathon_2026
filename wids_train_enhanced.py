@@ -330,7 +330,7 @@ def train_and_evaluate():
         probs_blend = (W_PHYS * p_phys) + (W_XGB * p_xgb) + (W_RF * p_rf) + (W_GB * p_gb)
         
         # 4. Calibration (power transform)
-        probs_final = np.power(probs_blend, 1.2)  # SQUISH factor
+        probs_final = np.power(probs_blend, 1.15)  # SQUISH factor - reduced for better calibration
         
         # 5. Post-processing adjustments
         # Uncertain fires (no perimeter data)
