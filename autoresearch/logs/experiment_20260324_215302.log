@@ -1,0 +1,47 @@
+
+======================================================================
+Enhanced Small-Data Training: 17 features
+Ensemble: PHYS=0.62, XGB=0.28, RF=0.05, GB=0.05
+======================================================================
+
+
+======================================================================
+WiDS Enhanced Training: 5-Fold CV with Anti-Overfitting
+======================================================================
+Data regime: Small (n=221, pos=69, neg=152)
+Strategy: Heavy regularization, shallow trees, feature validation
+======================================================================
+
+✓ Feature validation passed (17 features)
+  Positive class: 69 | Negative class: 152
+
+Fold   Hybrid     C-Idx    Brier    Balance    Overfit   
+----------------------------------------------------------------------
+1      0.998520   1.0000   0.0021   OK         --        
+2      0.938118   1.0000   0.0884   OK         --        
+3      0.975930   1.0000   0.0344   OK         --        
+4      0.991577   1.0000   0.0120   OK         --        
+5      0.978742   1.0000   0.0304   OK         --        
+----------------------------------------------------------------------
+MEAN   0.976577   1.0000   0.0335  
+
+Stability (1 - CV std/mean): 0.9786
+Fold variance: 0.020932
+Training time: 15.8s
+======================================================================
+
+
+======================================================================
+FINAL METRICS
+======================================================================
+  Hybrid Score:  0.976577
+  C-Index:       1.000000
+  Brier Score:   0.033461
+  Stability:     0.9786 (higher = better)
+  Fold Std:      0.020932
+  Time:          15.8s
+======================================================================
+
+⚠️  WARNING: High fold variance detected - possible overfitting!
+   Recommendation: Increase regularization (deeper L2/min_samples_leaf)
+

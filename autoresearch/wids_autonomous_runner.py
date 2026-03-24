@@ -22,10 +22,16 @@ import re
 import time
 import random
 import shutil
+import copy
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
 import numpy as np
+
+try:
+    import yaml
+except Exception:
+    yaml = None
 
 # ============================================================================
 # Configuration
@@ -37,12 +43,13 @@ LOG_DIR = PROJECT_ROOT / "logs"
 LOG_DIR.mkdir(exist_ok=True)
 
 TRAINING_SCRIPT = PROJECT_ROOT / "wids_train_enhanced.py"
+CONFIG_FILE = PROJECT_ROOT / "wids_config.yaml"
 EXPERIMENT_RUNNER = PROJECT_ROOT / "wids_experiment_runner.py"
 
 # Default autonomous config
 MAX_EXPERIMENTS = 30
-MIN_IMPROVEMENT = 0.0010
-PATIENCE = 5  # Stop if no improvement after N experiments
+MIN_IMPROVEMENT = 0.0003
+PATIENCE = 10  # Stop if no improvement after N experiments (increased for more exploration)
 OVERNIGHT_MODE = False
 
 # ============================================================================
@@ -94,6 +101,13 @@ class ExperimentStrategy:
         self.experiment_count = 0
         self.best_score = 0.0
         self.no_improvement_count = 0
+        self.random_pool = self.PHASE1_WEIGHTS + self.PHASE2_HYPERPARAMS + self.PHASE3_CALIBRATION
+        self.used_random_configs = set()
+
+    @staticmethod
+    def _config_key(config: dict) -> tuple:
+        """Create a stable hashable key for a config dict."""
+        return tuple(sorted((k, str(v)) for k, v in config.items()))
 
     def get_next_experiment(self, results_df: pd.DataFrame) -> dict:
         """Get next experiment configuration based on current progress."""
@@ -128,7 +142,17 @@ class ExperimentStrategy:
             # Random exploration for remaining experiments
             self.current_phase = 4
             config_type = 'random'
-            configs = random.choice(self.PHASE1_WEIGHTS + self.PHASE2_HYPERPARAMS)
+            available = [
+                cfg for cfg in self.random_pool
+                if self._config_key(cfg) not in self.used_random_configs
+            ]
+
+            if not available:
+                self.used_random_configs.clear()
+                available = self.random_pool.copy()
+
+            configs = random.choice(available)
+            self.used_random_configs.add(self._config_key(configs))
 
         return {
             'phase': self.current_phase,
@@ -143,17 +167,42 @@ class ExperimentStrategy:
 # ============================================================================
 
 def read_training_script() -> str:
-    """Read current training script."""
+    """Read current editable configuration source (YAML preferred)."""
+    if CONFIG_FILE.exists() and yaml is not None:
+        with open(CONFIG_FILE, 'r', encoding='utf-8') as handle:
+            return yaml.safe_load(handle) or {}
     return TRAINING_SCRIPT.read_text()
 
 
 def write_training_script(content: str):
-    """Write modified training script."""
+    """Write modified configuration source (YAML preferred)."""
+    if isinstance(content, dict) and CONFIG_FILE.exists() and yaml is not None:
+        with open(CONFIG_FILE, 'w', encoding='utf-8') as handle:
+            yaml.safe_dump(content, handle, sort_keys=False)
+        return
     TRAINING_SCRIPT.write_text(content)
 
 
 def modify_weights(content: str, weights: dict) -> tuple[str, str]:
     """Modify ensemble weights in the training script."""
+
+    if isinstance(content, dict):
+        modified = copy.deepcopy(content)
+        ensemble = modified.setdefault('ensemble', {})
+        if 'W_PHYS' in weights:
+            ensemble['w_phys'] = float(weights['W_PHYS'])
+        if 'W_XGB' in weights:
+            ensemble['w_xgb'] = float(weights['W_XGB'])
+        if 'W_RF' in weights:
+            ensemble['w_rf'] = float(weights['W_RF'])
+        if 'W_GB' in weights:
+            ensemble['w_gb'] = float(weights['W_GB'])
+
+        if 'desc' in weights:
+            description = f"Phase 1: {weights['desc']}"
+        else:
+            description = "Phase 1 weights (yaml)"
+        return modified, description
 
     modified = content
 
@@ -179,6 +228,18 @@ def modify_weights(content: str, weights: dict) -> tuple[str, str]:
 
 def modify_hyperparams(content: str, hyperparams: dict) -> tuple[str, str]:
     """Modify hyperparameters in the training script."""
+
+    if isinstance(content, dict):
+        modified = copy.deepcopy(content)
+        mp = modified.setdefault('model_params', {})
+        description_parts = []
+        for key, value in hyperparams.items():
+            if key == 'desc':
+                continue
+            mp[key] = value
+            description_parts.append(f"{key}={value}")
+        description = f"Phase 2 hyperparams: {', '.join(description_parts)}"
+        return modified, description
 
     modified = content
     description_parts = []
@@ -207,6 +268,13 @@ def modify_hyperparams(content: str, hyperparams: dict) -> tuple[str, str]:
 def modify_calibration(content: str, power: float) -> tuple[str, str]:
     """Modify calibration power in the training script."""
 
+    if isinstance(content, dict):
+        modified = copy.deepcopy(content)
+        calibration = modified.setdefault('calibration', {})
+        calibration['power_squish'] = float(power)
+        description = f"Phase 3 calibration: power={power:.1f}"
+        return modified, description
+
     pattern = rf'(probs_final\s*=\s*np\.power\(probs_blend,\s*)[\d.]+'
     replacement = f'\\g<1>{power:.1f}'
     modified = re.sub(pattern, replacement, content)
@@ -228,8 +296,19 @@ def apply_experiment_config(content: str, experiment: dict) -> tuple[str, str]:
     elif config_type == 'calibration':
         return modify_calibration(content, config.get('squish_power', 1.2))
     else:
-        # Random - just return original
-        return content, f"Random exploration: {config}"
+        # Random - route to the correct modifier based on keys
+        if any(k.startswith('W_') for k in config.keys()):
+            modified, desc = modify_weights(content, config)
+            return modified, f"Random exploration ({desc})"
+        if 'squish_power' in config:
+            modified, desc = modify_calibration(content, config.get('squish_power', 1.2))
+            return modified, f"Random exploration ({desc})"
+        if any(k.startswith(('xgb_', 'rf_', 'gb_')) for k in config.keys()):
+            modified, desc = modify_hyperparams(content, config)
+            return modified, f"Random exploration ({desc})"
+
+        # Fallback safety
+        return content, f"Random exploration (no-op): {config}"
 
 
 # ============================================================================
@@ -485,6 +564,8 @@ def run_autonomous_loop(max_experiments: int = MAX_EXPERIMENTS):
 
         # Backup current script
         backup_content = read_training_script()
+        if isinstance(backup_content, dict):
+            backup_content = copy.deepcopy(backup_content)
 
         # Apply experiment configuration
         modified_content, description = apply_experiment_config(backup_content, experiment)

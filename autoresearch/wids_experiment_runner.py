@@ -147,7 +147,7 @@ def get_git_commit_hash() -> str:
     try:
         result = subprocess.run(
             ['git', 'rev-parse', '--short', 'HEAD'],
-            cwd=REPO_ROOT,
+            cwd=PROJECT_ROOT,
             capture_output=True,
             text=True,
             timeout=5

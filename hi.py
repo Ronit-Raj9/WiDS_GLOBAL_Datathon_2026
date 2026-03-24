@@ -106,66 +106,6 @@ def calculate_metric(probs, times, events):
     c_score = roc_auc_score(((times <= 72) & (events == 1)).astype(int), probs[:, 3])
     return 0.10 * c_score + 0.90 * (1 - b_total)
 
-    # --- 4. Final Submission Generation ---
-print("\n=== Generating Enhanced Submission ===")
-
-# Physics predictions on test
-p_phys_test = get_physics_probs(test_df, train_df)
-
-# Train all models on full training data
-p_xgb_test, p_rf_test, p_gb_test = np.zeros_like(p_phys_test), np.zeros_like(p_phys_test), np.zeros_like(p_phys_test)
-
-for i, h in enumerate([12, 24, 48, 72]):
-    y_tr_h = ((train_df['time_to_hit_hours'] <= h) & (train_df['event'] == 1)).astype(int)
-
-    # XGBoost
-    xgb = XGBClassifier(n_estimators=150, max_depth=4, learning_rate=0.03, random_state=42, verbosity=0,
-                       subsample=0.8, colsample_bytree=0.8)
-    xgb.fit(train_df[X_features], y_tr_h)
-    p_xgb_test[:, i] = xgb.predict_proba(test_df[X_features])[:, 1]
-
-    # Random Forest
-    rf = RandomForestClassifier(n_estimators=250, max_depth=6, random_state=42, min_samples_leaf=3)
-    rf.fit(train_df[X_features], y_tr_h)
-    p_rf_test[:, i] = rf.predict_proba(test_df[X_features])[:, 1]
-
-    # Gradient Boosting
-    gb = GradientBoostingClassifier(n_estimators=100, max_depth=3, learning_rate=0.05, random_state=42)
-    gb.fit(train_df[X_features], y_tr_h)
-    p_gb_test[:, i] = gb.predict_proba(test_df[X_features])[:, 1]
-
-# Final ensemble
-final_probs = (W_PHYS * p_phys_test) + (W_XGB * p_xgb_test) + (W_RF * p_rf_test) + (W_GB * p_gb_test)
-final_probs = np.power(final_probs, SQUISH)
-
-# Apply adjustments
-final_probs[test_df['num_perimeters_0_5h'] == 0] *= 0.95
-
-# Close fires adjustment
-close_mask = test_df['dist_min_ci_0_5h'] < 5000
-final_probs[close_mask] = np.clip(final_probs[close_mask], 0.01, 0.99)
-
-# Create submission
-submission = pd.DataFrame({
-    'event_id': test_df['event_id'],
-    'prob_12h': final_probs[:, 0],
-    'prob_24h': final_probs[:, 1],
-    'prob_48h': final_probs[:, 2],
-    'prob_72h': final_probs[:, 3]
-})
-
-# Ensure monotonicity (prob_12h <= prob_24h <= prob_48h <= prob_72h)
-submission[['prob_12h', 'prob_24h', 'prob_48h', 'prob_72h']] = np.sort(
-    submission[['prob_12h', 'prob_24h', 'prob_48h', 'prob_72h']].values, axis=1
-)
-
-# Save submission
-submission.to_csv('submission_enhanced.csv', index=False)
-print("Saved: submission_enhanced.csv")
-print(f"\nSubmission shape: {submission.shape}")
-print(f"CV Score: {np.mean(cv_scores):.6f}")
-print(f"\nSample predictions:\n{submission.head(10)}")
-
 # --- 3. Enhanced Feature Set & Triple Ensemble CV with Additional Models ---
 # Updated features with enhanced engineering
 X_features = [
@@ -241,3 +181,63 @@ for fold, (train_idx, val_idx) in enumerate(skf.split(train_df, y_target)):
     print(f"Fold {fold+1}: {fold_score:.6f}")
 
 print(f"\n=== Enhanced Mean CV: {np.mean(cv_scores):.6f} ===")
+
+# --- 4. Final Submission Generation ---
+print("\n=== Generating Enhanced Submission ===")
+
+# Physics predictions on test
+p_phys_test = get_physics_probs(test_df, train_df)
+
+# Train all models on full training data
+p_xgb_test, p_rf_test, p_gb_test = np.zeros_like(p_phys_test), np.zeros_like(p_phys_test), np.zeros_like(p_phys_test)
+
+for i, h in enumerate([12, 24, 48, 72]):
+    y_tr_h = ((train_df['time_to_hit_hours'] <= h) & (train_df['event'] == 1)).astype(int)
+
+    # XGBoost
+    xgb = XGBClassifier(n_estimators=150, max_depth=4, learning_rate=0.03, random_state=42, verbosity=0,
+                        subsample=0.8, colsample_bytree=0.8)
+    xgb.fit(train_df[X_features], y_tr_h)
+    p_xgb_test[:, i] = xgb.predict_proba(test_df[X_features])[:, 1]
+
+    # Random Forest
+    rf = RandomForestClassifier(n_estimators=250, max_depth=6, random_state=42, min_samples_leaf=3)
+    rf.fit(train_df[X_features], y_tr_h)
+    p_rf_test[:, i] = rf.predict_proba(test_df[X_features])[:, 1]
+
+    # Gradient Boosting
+    gb = GradientBoostingClassifier(n_estimators=100, max_depth=3, learning_rate=0.05, random_state=42)
+    gb.fit(train_df[X_features], y_tr_h)
+    p_gb_test[:, i] = gb.predict_proba(test_df[X_features])[:, 1]
+
+# Final ensemble
+final_probs = (W_PHYS * p_phys_test) + (W_XGB * p_xgb_test) + (W_RF * p_rf_test) + (W_GB * p_gb_test)
+final_probs = np.power(final_probs, SQUISH)
+
+# Apply adjustments
+final_probs[test_df['num_perimeters_0_5h'] == 0] *= 0.95
+
+# Close fires adjustment
+close_mask = test_df['dist_min_ci_0_5h'] < 5000
+final_probs[close_mask] = np.clip(final_probs[close_mask], 0.01, 0.99)
+
+# Create submission
+submission = pd.DataFrame({
+    'event_id': test_df['event_id'],
+    'prob_12h': final_probs[:, 0],
+    'prob_24h': final_probs[:, 1],
+    'prob_48h': final_probs[:, 2],
+    'prob_72h': final_probs[:, 3]
+})
+
+# Ensure monotonicity (prob_12h <= prob_24h <= prob_48h <= prob_72h)
+submission[['prob_12h', 'prob_24h', 'prob_48h', 'prob_72h']] = np.sort(
+    submission[['prob_12h', 'prob_24h', 'prob_48h', 'prob_72h']].values, axis=1
+)
+
+# Save submission
+submission.to_csv('submission_enhanced.csv', index=False)
+print("Saved: submission_enhanced.csv")
+print(f"\nSubmission shape: {submission.shape}")
+print(f"CV Score: {np.mean(cv_scores):.6f}")
+print(f"\nSample predictions:\n{submission.head(10)}")

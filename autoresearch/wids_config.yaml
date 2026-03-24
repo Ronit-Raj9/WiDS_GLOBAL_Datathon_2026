@@ -1,0 +1,77 @@
+ensemble:
+  w_phys: 0.8
+  w_xgb: 0.1
+  w_rf: 0.05
+  w_gb: 0.05
+calibration:
+  power_squish: 1.0
+two_regime:
+  far_dist_threshold: 5000
+  far_probs:
+  - 0.01
+  - 0.02
+  - 0.03
+  - 0.04
+  use_close_cox: true
+  cox_blend_weight: 0.6
+  cox_penalizer: 0.5
+  cox_feature_candidates:
+  - low_temporal_resolution_0_5h
+  - dt_first_last_0_5h
+  - alignment_abs
+  - num_perimeters_0_5h
+  - spread_bearing_cos
+  - growth_efficiency
+  - radial_growth_rate_m_per_h
+model_params:
+  xgb_n_estimators: 150
+  xgb_max_depth: 4
+  xgb_learning_rate: 0.03
+  xgb_subsample: 0.8
+  xgb_colsample_bytree: 0.8
+  xgb_min_child_weight: 5
+  xgb_gamma: 1.0
+  xgb_reg_lambda: 2.0
+  rf_n_estimators: 250
+  rf_max_depth: 6
+  rf_min_samples_leaf: 3
+  rf_min_samples_split: 6
+  rf_max_features: sqrt
+  gb_n_estimators: 100
+  gb_max_depth: 3
+  gb_learning_rate: 0.05
+  gb_subsample: 0.8
+  gb_min_samples_leaf: 5
+  gb_min_samples_split: 10
+features:
+  feature_set:
+  - dist
+  - v_stable
+  - eta_kinetic
+  - alignment_abs
+  - area_first_ha
+  - density_metric
+  - speed_alignment
+  - kinetic_energy
+  - approach_rate
+  - lateral_motion
+  - dist_to_initial_ratio
+  - dist_std_normalized
+  - growth_efficiency
+  - radial_to_area_ratio
+  - is_night
+  - is_weekend
+  - hour_sin
+  - hour_cos
+  - dist_squared
+  - v_stable_squared
+  - alignment_squared
+  - closing_to_centroid_ratio
+  - num_perimeters_0_5h
+  - closing_speed_m_per_h
+  - radial_growth_rate_m_per_h
+  - centroid_speed_m_per_h
+  - area_growth_rel_0_5h
+  - dist_slope_ci_0_5h
+  - dist_change_ci_0_5h
+  - along_track_speed

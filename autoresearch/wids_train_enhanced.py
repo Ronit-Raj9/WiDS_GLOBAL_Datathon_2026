@@ -25,9 +25,9 @@ import sys
 import time
 import numpy as np
 import pandas as pd
+from pathlib import Path
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.isotonic import IsotonicRegression
 from xgboost import XGBClassifier
 import warnings
 warnings.filterwarnings('ignore')
@@ -45,8 +45,8 @@ from wids_prepare import (
 # For small data: physics (domain knowledge) dominates
 # ML models help with ranking (C-index 30%) but risk overfitting
 
-W_PHYS = 0.65      # Physics-based model (domain knowledge)
-W_XGB = 0.25       # XGBoost (fast learner, good for ranking)
+W_PHYS = 0.80      # Physics-based model (domain knowledge)
+W_XGB = 0.10       # XGBoost (fast learner, good for ranking)
 W_RF = 0.05        # Random Forest (ensemble diversity)
 W_GB = 0.05        # Gradient Boosting (calibration focus)
 
@@ -60,8 +60,30 @@ assert abs(W_PHYS + W_XGB + W_RF + W_GB - 1.0) < 0.001, "Weights must sum to 1"
 # Power: simple, smooth transformation
 # Isotonic: non-parametric, learns optimal calibration from CV data
 
-CALIBRATION_METHOD = 'isotonic'  # Try isotonic for better calibration
-POWER_SQUISH = 0.9  # Used when CALIBRATION_METHOD = 'power'
+POWER_SQUISH = 1.2
+
+
+# ============================================================================
+# MODIFIABLE: Two-Regime Survival Settings
+# ============================================================================
+
+FAR_DIST_THRESHOLD = 5000
+FAR_PROBS = np.array([0.01, 0.02, 0.03, 0.04])
+USE_CLOSE_COX = True
+COX_BLEND_WEIGHT = 0.60
+COX_PENALIZER = 0.5
+
+COX_FEATURE_CANDIDATES = [
+    'low_temporal_resolution_0_5h',
+    'dt_first_last_0_5h',
+    'alignment_abs',
+    'num_perimeters_0_5h',
+    'spread_bearing_cos',
+    'growth_efficiency',
+    'radial_growth_rate_m_per_h',
+]
+
+CONFIG_PATH = Path(__file__).parent / "wids_config.yaml"
 
 
 # ============================================================================
@@ -78,26 +100,26 @@ class ModelParams:
     """
     
     # ---- XGBoost: Fast, good for ranking ----
-    xgb_n_estimators = 100        # Smaller ensemble (fewer iterations = less overfitting)
-    xgb_max_depth = 3              # SHALLOW trees prevent memorization
-    xgb_learning_rate = 0.05       # Moderate learning rate (stable convergence)
-    xgb_subsample = 0.7            # Row sampling (70% of data per iteration)
-    xgb_colsample_bytree = 0.7     # Column sampling (70% of features per tree)
+    xgb_n_estimators = 150         # Stronger learner from validated notebook setup
+    xgb_max_depth = 4              # Slightly deeper trees
+    xgb_learning_rate = 0.03       # Slower learning for smoother fit
+    xgb_subsample = 0.8            # Higher row sampling
+    xgb_colsample_bytree = 0.8     # Higher feature sampling
     xgb_min_child_weight = 5       # Minimum samples in leaf (higher = smoother)
     xgb_gamma = 1.0                # L2 regularization penalty (complex splits need benefit)
     xgb_reg_lambda = 2.0           # L2 coefficient (prevents overfit)
     
     # ---- Random Forest: Diversity and robustness ----
-    rf_n_estimators = 150           # Moderate ensemble size
-    rf_max_depth = 4                # SHALLOW (RF naturally overfits with deep trees)
-    rf_min_samples_leaf = 5         # Each leaf has >=5 samples (for n=221)
-    rf_min_samples_split = 10       # Split only if >=10 samples (smooth splits)
+    rf_n_estimators = 250           # Stronger RF ensemble
+    rf_max_depth = 6                # Moderate depth
+    rf_min_samples_leaf = 3         # More flexible leaves
+    rf_min_samples_split = 6        # Lower split threshold
     rf_max_features = 'sqrt'        # Use sqrt(features) per split (reduces correlation)
     
     # ---- Gradient Boosting: Calibration focus ----
-    gb_n_estimators = 80            # Smaller ensemble
-    gb_max_depth = 2                # SHALLOW (GBM prone to overfitting)
-    gb_learning_rate = 0.03         # Lower LR (slower, more stable)
+    gb_n_estimators = 100           # Stronger GB ensemble
+    gb_max_depth = 3                # Moderate depth
+    gb_learning_rate = 0.05         # Faster learning from validated setup
     gb_subsample = 0.8              # Row sampling
     gb_min_samples_leaf = 5         # Minimum samples per leaf
     gb_min_samples_split = 10       # Split threshold
@@ -110,35 +132,70 @@ class ModelParams:
 # Recommendation: Start with 18-20 core features, add/remove based on CV
 
 FEATURE_SET = [
-    # ===== CORE PHYSICS FEATURES (must-keep) =====
-    'dist',                          # Distance to evacuation zone
-    'v_stable',                       # Stable velocity (closing + radial growth)
-    'alignment_abs',                  # Direction alignment to zone
-    'area_first_ha',                  # Initial fire area
-
-    # ===== INTERACTION FEATURES (physics-driven) =====
-    'eta_kinetic',                    # Distance / velocity ratio
-    'density_metric',                 # Area / distance ratio
-    'speed_alignment',                # Speed × alignment product
-    'kinetic_energy',                 # Area × velocity^2
-    'approach_rate',                  # Closing speed × alignment
-
-    # ===== DISTANCE FEATURES (high predictive power) =====
-    'dist_to_initial_ratio',          # Distance ratio feature
-    'dist_slope_ci_0_5h',             # Distance change rate
-    'closing_speed_m_per_h',          # Direct distance closing speed
-
-    # ===== TEMPORAL FEATURES (circadian effects) =====
-    'is_night',                       # Night vs day
-    'hour_sin', 'hour_cos',           # Hour of day (circular encoding)
-
-    # ===== GROWTH FEATURES (fire spread) =====
-    'area_growth_rel_0_5h',           # Relative growth
-    'radial_growth_rate_m_per_h',     # Radial spread rate
-
-    # ===== ADDITIONAL FEATURES (test) =====
-    'lateral_motion',                 # Perpendicular motion (reduces threat)
+    'dist', 'v_stable', 'eta_kinetic', 'alignment_abs', 'area_first_ha', 'density_metric', 'speed_alignment',
+    'kinetic_energy', 'approach_rate', 'lateral_motion', 'dist_to_initial_ratio', 'dist_std_normalized',
+    'growth_efficiency', 'radial_to_area_ratio', 'is_night', 'is_weekend', 'hour_sin', 'hour_cos',
+    'dist_squared', 'v_stable_squared', 'alignment_squared', 'closing_to_centroid_ratio',
+    'num_perimeters_0_5h', 'closing_speed_m_per_h', 'radial_growth_rate_m_per_h', 'centroid_speed_m_per_h',
+    'area_growth_rel_0_5h', 'dist_slope_ci_0_5h', 'dist_change_ci_0_5h', 'along_track_speed',
 ]
+
+
+def load_runtime_config(config_path: Path = CONFIG_PATH):
+    """Load optional YAML config and override runtime settings."""
+    if not config_path.exists():
+        return
+
+    try:
+        import yaml
+    except ImportError as exc:
+        raise ImportError(
+            "wids_config.yaml found but PyYAML is not installed. Install with: pip install pyyaml"
+        ) from exc
+
+    with open(config_path, 'r', encoding='utf-8') as handle:
+        cfg = yaml.safe_load(handle) or {}
+
+    global W_PHYS, W_XGB, W_RF, W_GB
+    ensemble = cfg.get('ensemble', {})
+    W_PHYS = float(ensemble.get('w_phys', W_PHYS))
+    W_XGB = float(ensemble.get('w_xgb', W_XGB))
+    W_RF = float(ensemble.get('w_rf', W_RF))
+    W_GB = float(ensemble.get('w_gb', W_GB))
+
+    global POWER_SQUISH
+    calibration = cfg.get('calibration', {})
+    POWER_SQUISH = float(calibration.get('power_squish', POWER_SQUISH))
+
+    global FAR_DIST_THRESHOLD, FAR_PROBS, USE_CLOSE_COX, COX_BLEND_WEIGHT, COX_PENALIZER, COX_FEATURE_CANDIDATES
+    two_regime = cfg.get('two_regime', {})
+    FAR_DIST_THRESHOLD = int(two_regime.get('far_dist_threshold', FAR_DIST_THRESHOLD))
+    far_probs = two_regime.get('far_probs', FAR_PROBS)
+    FAR_PROBS = np.array(far_probs, dtype=float)
+    USE_CLOSE_COX = bool(two_regime.get('use_close_cox', USE_CLOSE_COX))
+    COX_BLEND_WEIGHT = float(two_regime.get('cox_blend_weight', COX_BLEND_WEIGHT))
+    COX_PENALIZER = float(two_regime.get('cox_penalizer', COX_PENALIZER))
+    if two_regime.get('cox_feature_candidates'):
+        COX_FEATURE_CANDIDATES = list(two_regime['cox_feature_candidates'])
+
+    model_params = cfg.get('model_params', {})
+    for key, value in model_params.items():
+        if hasattr(ModelParams, key):
+            setattr(ModelParams, key, value)
+
+    global FEATURE_SET
+    features = cfg.get('features', {}).get('feature_set')
+    if features:
+        FEATURE_SET = list(features)
+
+    if abs(W_PHYS + W_XGB + W_RF + W_GB - 1.0) > 0.001:
+        raise ValueError("Config weights must sum to 1.0")
+
+    if FAR_PROBS.shape[0] != 4:
+        raise ValueError("two_regime.far_probs must have exactly 4 values [12h,24h,48h,72h]")
+
+
+load_runtime_config()
 
 # Note: We deliberately omit some features to reduce overfitting
 # Features like 'v_stable_squared', 'alignment_squared' often add noise with small data
@@ -203,6 +260,40 @@ def validate_feature_set(train_df, feature_set, y):
     return is_valid, missing, nans
 
 
+def predict_close_fire_cox(df_train, df_val, horizons=(12, 24, 48, 72)):
+    """
+    Fit Cox model on close-fire training subset and return close-fire probs for df_val.
+    Returns None if model cannot be fit robustly.
+    """
+    try:
+        from lifelines import CoxPHFitter
+    except Exception:
+        return None
+
+    close_train = df_train[df_train['dist_min_ci_0_5h'] < FAR_DIST_THRESHOLD].copy()
+    close_val = df_val[df_val['dist_min_ci_0_5h'] < FAR_DIST_THRESHOLD].copy()
+
+    if len(close_val) == 0 or len(close_train) < 20:
+        return None
+
+    cox_features = [f for f in COX_FEATURE_CANDIDATES if f in close_train.columns]
+    if len(cox_features) < 3:
+        return None
+
+    fit_df = close_train[cox_features + ['time_to_hit_hours', 'event']].copy()
+
+    if fit_df['time_to_hit_hours'].nunique() < 5:
+        return None
+
+    cph = CoxPHFitter(penalizer=COX_PENALIZER)
+    cph.fit(fit_df, duration_col='time_to_hit_hours', event_col='event')
+
+    sf = cph.predict_survival_function(close_val[cox_features], times=list(horizons))
+    probs_close = 1.0 - sf.values.T
+    probs_close = np.clip(probs_close, 0.001, 0.999)
+    return probs_close
+
+
 # ============================================================================
 # Stratified K-Fold with Multiple Seeds (Better Small-Data Validation)
 # ============================================================================
@@ -258,6 +349,9 @@ def train_and_evaluate():
     
     print(f"✓ Feature validation passed ({len(FEATURE_SET)} features)")
     print(f"  Positive class: {y_target.sum()} | Negative class: {(~y_target.astype(bool)).sum()}")
+    close_n = int((train_df['dist_min_ci_0_5h'] < FAR_DIST_THRESHOLD).sum())
+    far_n = len(train_df) - close_n
+    print(f"  Regimes: close(<{FAR_DIST_THRESHOLD}m)={close_n}, far(≥{FAR_DIST_THRESHOLD}m)={far_n}")
     print()
     
     # CV setup
@@ -287,15 +381,11 @@ def train_and_evaluate():
         
         # 1. Physics model (fixed)
         p_phys = get_physics_probs(df_val, df_train)
-        p_phys_train = get_physics_probs(df_train, df_train)
 
         # 2. ML models with regularization
         p_xgb = np.zeros((len(df_val), 4))
         p_rf = np.zeros((len(df_val), 4))
         p_gb = np.zeros((len(df_val), 4))
-        p_xgb_train = np.zeros((len(df_train), 4))
-        p_rf_train = np.zeros((len(df_train), 4))
-        p_gb_train = np.zeros((len(df_train), 4))
 
         feature_importance_all = {}
 
@@ -318,7 +408,6 @@ def train_and_evaluate():
             )
             xgb_model.fit(df_train[FEATURE_SET], y_h)
             p_xgb[:, h_idx] = xgb_model.predict_proba(df_val[FEATURE_SET])[:, 1]
-            p_xgb_train[:, h_idx] = xgb_model.predict_proba(df_train[FEATURE_SET])[:, 1]
 
             # ===== Random Forest (with regularization) =====
             rf_model = RandomForestClassifier(
@@ -332,7 +421,6 @@ def train_and_evaluate():
             )
             rf_model.fit(df_train[FEATURE_SET], y_h)
             p_rf[:, h_idx] = rf_model.predict_proba(df_val[FEATURE_SET])[:, 1]
-            p_rf_train[:, h_idx] = rf_model.predict_proba(df_train[FEATURE_SET])[:, 1]
 
             # ===== Gradient Boosting (with regularization) =====
             gb_model = GradientBoostingClassifier(
@@ -346,34 +434,30 @@ def train_and_evaluate():
             )
             gb_model.fit(df_train[FEATURE_SET], y_h)
             p_gb[:, h_idx] = gb_model.predict_proba(df_val[FEATURE_SET])[:, 1]
-            p_gb_train[:, h_idx] = gb_model.predict_proba(df_train[FEATURE_SET])[:, 1]
         
         # 3. Ensemble blend
         probs_blend = (W_PHYS * p_phys) + (W_XGB * p_xgb) + (W_RF * p_rf) + (W_GB * p_gb)
 
-        # 4. Calibration
-        if CALIBRATION_METHOD == 'isotonic':
-            # Isotonic regression calibration (non-parametric, monotonic)
-            probs_final = np.zeros_like(probs_blend)
-
-            for h_idx, h in enumerate([12, 24, 48, 72]):
-                # Fit isotonic regressor on train fold
-                y_h_train = ((df_train['time_to_hit_hours'] <= h) & (df_train['event'] == 1)).astype(int)
-
-                # Get train predictions for calibration
-                p_train_blend_h = (W_PHYS * p_phys_train[:, h_idx]) + \
-                                  (W_XGB * p_xgb_train[:, h_idx]) + \
-                                  (W_RF * p_rf_train[:, h_idx]) + \
-                                  (W_GB * p_gb_train[:, h_idx])
-
-                ir = IsotonicRegression(out_of_bounds='clip')
-                ir.fit(p_train_blend_h, y_h_train)
-                probs_final[:, h_idx] = ir.transform(probs_blend[:, h_idx])
-        else:
-            # Power transform calibration (simple, smooth)
-            probs_final = np.power(probs_blend, POWER_SQUISH)
+        # 4. Calibration (power transform)
+        probs_final = np.power(probs_blend, POWER_SQUISH)
         
-        # 5. Post-processing adjustments
+        # 5. Two-regime prediction
+        far_mask = df_val['dist_min_ci_0_5h'] >= FAR_DIST_THRESHOLD
+        close_mask = ~far_mask
+
+        if far_mask.any():
+            probs_final[far_mask.values] = FAR_PROBS
+
+        if USE_CLOSE_COX and close_mask.any():
+            probs_close_cox = predict_close_fire_cox(df_train, df_val)
+            if probs_close_cox is not None:
+                current_close = probs_final[close_mask.values]
+                probs_final[close_mask.values] = (
+                    (1.0 - COX_BLEND_WEIGHT) * current_close +
+                    COX_BLEND_WEIGHT * probs_close_cox
+                )
+
+        # 6. Post-processing adjustments
         # Uncertain fires (no perimeter data)
         probs_final[df_val['num_perimeters_0_5h'] == 0] *= 0.95
         
@@ -381,10 +465,10 @@ def train_and_evaluate():
         close_mask = df_val['dist_min_ci_0_5h'] < 5000
         probs_final[close_mask] = np.clip(probs_final[close_mask], 0.01, 0.99)
         
-        # 6. Monotonicity enforcement
+        # 7. Monotonicity enforcement
         probs_final = ensure_monotonicity(probs_final)
         
-        # 7. Evaluate
+        # 8. Evaluate
         metrics = calculate_hybrid_score(y_time_val, probs_final, y_event_val)
         
         fold_score = metrics['hybrid_score']

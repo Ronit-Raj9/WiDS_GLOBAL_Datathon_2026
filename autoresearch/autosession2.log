@@ -1,0 +1,738 @@
+Autonomous mode: False
+Max experiments: 100
+
+
+======================================================================
+WiDS AUTONOMOUS OPTIMIZATION
+======================================================================
+Max experiments: 100
+Min improvement: 0.0003
+Start time: 2026-03-24 21:40:00
+======================================================================
+
+
+==================================================
+EXPERIMENT 16/100
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: rf_max_depth=3
+
+======================================================================
+Experiment: Phase 2 hyperparams: rf_max_depth=3
+Timestamp: 2026-03-24 21:40:00
+======================================================================
+
+
+ DISCARD: 0.958049 (-0.000058)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 16
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=4
+   [X ] 0.9504 | Phase 2 hyperparams: xgb_min_child_weight=10
+   [X ] 0.9577 | Phase 2 hyperparams: xgb_learning_rate=0.03
+   [X ] 0.9584 | Phase 2 hyperparams: xgb_learning_rate=0.1
+   [X ] 0.9580 | Phase 2 hyperparams: rf_max_depth=3
+======================================================================
+
+
+==================================================
+EXPERIMENT 17/100
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: rf_min_samples_leaf=10
+
+======================================================================
+Experiment: Phase 2 hyperparams: rf_min_samples_leaf=10
+Timestamp: 2026-03-24 21:40:25
+======================================================================
+
+
+ DISCARD: 0.957925 (-0.000182)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 17
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9504 | Phase 2 hyperparams: xgb_min_child_weight=10
+   [X ] 0.9577 | Phase 2 hyperparams: xgb_learning_rate=0.03
+   [X ] 0.9584 | Phase 2 hyperparams: xgb_learning_rate=0.1
+   [X ] 0.9580 | Phase 2 hyperparams: rf_max_depth=3
+   [X ] 0.9579 | Phase 2 hyperparams: rf_min_samples_leaf=10
+======================================================================
+
+
+==================================================
+EXPERIMENT 18/100
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: gb_max_depth=1
+
+======================================================================
+Experiment: Phase 2 hyperparams: gb_max_depth=1
+Timestamp: 2026-03-24 21:40:38
+======================================================================
+
+
+ DISCARD: 0.957999 (-0.000108)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 18
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9577 | Phase 2 hyperparams: xgb_learning_rate=0.03
+   [X ] 0.9584 | Phase 2 hyperparams: xgb_learning_rate=0.1
+   [X ] 0.9580 | Phase 2 hyperparams: rf_max_depth=3
+   [X ] 0.9579 | Phase 2 hyperparams: rf_min_samples_leaf=10
+   [X ] 0.9580 | Phase 2 hyperparams: gb_max_depth=1
+======================================================================
+
+
+==================================================
+EXPERIMENT 19/100
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: gb_learning_rate=0.02
+
+======================================================================
+Experiment: Phase 2 hyperparams: gb_learning_rate=0.02
+Timestamp: 2026-03-24 21:40:50
+======================================================================
+
+
+ DISCARD: 0.957679 (-0.000428)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 19
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9584 | Phase 2 hyperparams: xgb_learning_rate=0.1
+   [X ] 0.9580 | Phase 2 hyperparams: rf_max_depth=3
+   [X ] 0.9579 | Phase 2 hyperparams: rf_min_samples_leaf=10
+   [X ] 0.9580 | Phase 2 hyperparams: gb_max_depth=1
+   [X ] 0.9577 | Phase 2 hyperparams: gb_learning_rate=0.02
+======================================================================
+
+
+==================================================
+EXPERIMENT 20/100
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: xgb_subsample=0.6
+
+======================================================================
+Experiment: Phase 2 hyperparams: xgb_subsample=0.6
+Timestamp: 2026-03-24 21:41:01
+======================================================================
+
+
+ DISCARD: 0.957264 (-0.000843)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 20
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9580 | Phase 2 hyperparams: rf_max_depth=3
+   [X ] 0.9579 | Phase 2 hyperparams: rf_min_samples_leaf=10
+   [X ] 0.9580 | Phase 2 hyperparams: gb_max_depth=1
+   [X ] 0.9577 | Phase 2 hyperparams: gb_learning_rate=0.02
+   [X ] 0.9573 | Phase 2 hyperparams: xgb_subsample=0.6
+======================================================================
+
+
+==================================================
+EXPERIMENT 21/100
+Phase: 3 | Type: calibration
+==================================================
+
+Configuration: Phase 3 calibration: power=1.0
+
+======================================================================
+Experiment: Phase 3 calibration: power=1.0
+Timestamp: 2026-03-24 21:41:12
+======================================================================
+
+
+ KEEP: 0.962370 (+0.004263 vs best)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 21
+Kept: 4
+
+ Best score: 0.962370
+   C-Index: 1.000000
+   Brier: 0.053757
+   Config: Phase 3 calibration: power=1.0
+
+ Latest 5 experiments:
+   [X ] 0.9579 | Phase 2 hyperparams: rf_min_samples_leaf=10
+   [X ] 0.9580 | Phase 2 hyperparams: gb_max_depth=1
+   [X ] 0.9577 | Phase 2 hyperparams: gb_learning_rate=0.02
+   [X ] 0.9573 | Phase 2 hyperparams: xgb_subsample=0.6
+   [OK] 0.9624 | Phase 3 calibration: power=1.0
+======================================================================
+
+
+==================================================
+EXPERIMENT 22/100
+Phase: 3 | Type: calibration
+==================================================
+
+Configuration: Phase 3 calibration: power=1.3
+
+======================================================================
+Experiment: Phase 3 calibration: power=1.3
+Timestamp: 2026-03-24 21:41:24
+======================================================================
+
+
+ DISCARD: 0.954268 (-0.008102)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 22
+Kept: 4
+
+ Best score: 0.962370
+   C-Index: 1.000000
+   Brier: 0.053757
+   Config: Phase 3 calibration: power=1.0
+
+ Latest 5 experiments:
+   [X ] 0.9580 | Phase 2 hyperparams: gb_max_depth=1
+   [X ] 0.9577 | Phase 2 hyperparams: gb_learning_rate=0.02
+   [X ] 0.9573 | Phase 2 hyperparams: xgb_subsample=0.6
+   [OK] 0.9624 | Phase 3 calibration: power=1.0
+   [X ] 0.9543 | Phase 3 calibration: power=1.3
+======================================================================
+
+
+==================================================
+EXPERIMENT 23/100
+Phase: 3 | Type: calibration
+==================================================
+
+Configuration: Phase 3 calibration: power=1.1
+
+======================================================================
+Experiment: Phase 3 calibration: power=1.1
+Timestamp: 2026-03-24 21:41:34
+======================================================================
+
+
+ DISCARD: 0.959481 (-0.002889)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 23
+Kept: 4
+
+ Best score: 0.962370
+   C-Index: 1.000000
+   Brier: 0.053757
+   Config: Phase 3 calibration: power=1.0
+
+ Latest 5 experiments:
+   [X ] 0.9577 | Phase 2 hyperparams: gb_learning_rate=0.02
+   [X ] 0.9573 | Phase 2 hyperparams: xgb_subsample=0.6
+   [OK] 0.9624 | Phase 3 calibration: power=1.0
+   [X ] 0.9543 | Phase 3 calibration: power=1.3
+   [X ] 0.9595 | Phase 3 calibration: power=1.1
+======================================================================
+
+
+==================================================
+EXPERIMENT 24/100
+Phase: 3 | Type: calibration
+==================================================
+
+Configuration: Phase 3 calibration: power=1.4
+
+======================================================================
+Experiment: Phase 3 calibration: power=1.4
+Timestamp: 2026-03-24 21:41:48
+======================================================================
+
+
+ DISCARD: 0.951931 (-0.010439)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 24
+Kept: 4
+
+ Best score: 0.962370
+   C-Index: 1.000000
+   Brier: 0.053757
+   Config: Phase 3 calibration: power=1.0
+
+ Latest 5 experiments:
+   [X ] 0.9573 | Phase 2 hyperparams: xgb_subsample=0.6
+   [OK] 0.9624 | Phase 3 calibration: power=1.0
+   [X ] 0.9543 | Phase 3 calibration: power=1.3
+   [X ] 0.9595 | Phase 3 calibration: power=1.1
+   [X ] 0.9519 | Phase 3 calibration: power=1.4
+======================================================================
+
+
+==================================================
+EXPERIMENT 25/100
+Phase: 3 | Type: calibration
+==================================================
+
+Configuration: Phase 3 calibration: power=0.9
+
+======================================================================
+Experiment: Phase 3 calibration: power=0.9
+Timestamp: 2026-03-24 21:41:59
+======================================================================
+
+
+ KEEP: 0.965431 (+0.003061 vs best)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 25
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [OK] 0.9624 | Phase 3 calibration: power=1.0
+   [X ] 0.9543 | Phase 3 calibration: power=1.3
+   [X ] 0.9595 | Phase 3 calibration: power=1.1
+   [X ] 0.9519 | Phase 3 calibration: power=1.4
+   [OK] 0.9654 | Phase 3 calibration: power=0.9
+======================================================================
+
+
+==================================================
+EXPERIMENT 26/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'W_PHYS': 0.65, 'W_XGB': 0.25, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'Aggressive XGBoost'}
+
+======================================================================
+Experiment: Random exploration: {'W_PHYS': 0.65, 'W_XGB': 0.25, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'Aggressive XGBoost'}
+Timestamp: 2026-03-24 21:42:12
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 26
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9543 | Phase 3 calibration: power=1.3
+   [X ] 0.9595 | Phase 3 calibration: power=1.1
+   [X ] 0.9519 | Phase 3 calibration: power=1.4
+   [OK] 0.9654 | Phase 3 calibration: power=0.9
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+======================================================================
+
+
+==================================================
+EXPERIMENT 27/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'W_PHYS': 0.75, 'W_XGB': 0.15, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'Balanced baseline'}
+
+======================================================================
+Experiment: Random exploration: {'W_PHYS': 0.75, 'W_XGB': 0.15, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'Balanced baseline'}
+Timestamp: 2026-03-24 21:42:23
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 27
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9595 | Phase 3 calibration: power=1.1
+   [X ] 0.9519 | Phase 3 calibration: power=1.4
+   [OK] 0.9654 | Phase 3 calibration: power=0.9
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.75, 'W_XGB':
+======================================================================
+
+
+==================================================
+EXPERIMENT 28/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'xgb_min_child_weight': 10, 'desc': 'Higher min_child_weight (10)'}
+
+======================================================================
+Experiment: Random exploration: {'xgb_min_child_weight': 10, 'desc': 'Higher min_child_weight (10)'}
+Timestamp: 2026-03-24 21:42:35
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 28
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9519 | Phase 3 calibration: power=1.4
+   [OK] 0.9654 | Phase 3 calibration: power=0.9
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.75, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'xgb_min_child_weight': 
+======================================================================
+
+
+==================================================
+EXPERIMENT 29/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'W_PHYS': 0.72, 'W_XGB': 0.18, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'Conservative ML boost'}
+
+======================================================================
+Experiment: Random exploration: {'W_PHYS': 0.72, 'W_XGB': 0.18, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'Conservative ML boost'}
+Timestamp: 2026-03-24 21:42:52
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 29
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [OK] 0.9654 | Phase 3 calibration: power=0.9
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.75, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'xgb_min_child_weight': 
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.72, 'W_XGB':
+======================================================================
+
+
+==================================================
+EXPERIMENT 30/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'xgb_subsample': 0.6, 'desc': 'More aggressive subsampling (0.6)'}
+
+======================================================================
+Experiment: Random exploration: {'xgb_subsample': 0.6, 'desc': 'More aggressive subsampling (0.6)'}
+Timestamp: 2026-03-24 21:43:07
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 30
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.75, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'xgb_min_child_weight': 
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.72, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'xgb_subsample': 0.6, 'd
+======================================================================
+
+
+==================================================
+EXPERIMENT 31/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'W_PHYS': 0.68, 'W_XGB': 0.2, 'W_RF': 0.07, 'W_GB': 0.05, 'desc': 'ML-forward ensemble'}
+
+======================================================================
+Experiment: Random exploration: {'W_PHYS': 0.68, 'W_XGB': 0.2, 'W_RF': 0.07, 'W_GB': 0.05, 'desc': 'ML-forward ensemble'}
+Timestamp: 2026-03-24 21:43:17
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 31
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.75, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'xgb_min_child_weight': 
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.72, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'xgb_subsample': 0.6, 'd
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.68, 'W_XGB':
+======================================================================
+
+
+==================================================
+EXPERIMENT 32/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'W_PHYS': 0.65, 'W_XGB': 0.25, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'Aggressive XGBoost'}
+
+======================================================================
+Experiment: Random exploration: {'W_PHYS': 0.65, 'W_XGB': 0.25, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'Aggressive XGBoost'}
+Timestamp: 2026-03-24 21:43:28
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 32
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9654 | Random exploration: {'xgb_min_child_weight': 
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.72, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'xgb_subsample': 0.6, 'd
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.68, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+======================================================================
+
+
+==================================================
+EXPERIMENT 33/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'rf_max_depth': 3, 'desc': 'Shallower RF (depth=3)'}
+
+======================================================================
+Experiment: Random exploration: {'rf_max_depth': 3, 'desc': 'Shallower RF (depth=3)'}
+Timestamp: 2026-03-24 21:43:39
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 33
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.72, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'xgb_subsample': 0.6, 'd
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.68, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'rf_max_depth': 3, 'desc
+======================================================================
+
+
+==================================================
+EXPERIMENT 34/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'W_PHYS': 0.7, 'W_XGB': 0.2, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'More XGBoost for C-index'}
+
+======================================================================
+Experiment: Random exploration: {'W_PHYS': 0.7, 'W_XGB': 0.2, 'W_RF': 0.05, 'W_GB': 0.05, 'desc': 'More XGBoost for C-index'}
+Timestamp: 2026-03-24 21:43:52
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 34
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9654 | Random exploration: {'xgb_subsample': 0.6, 'd
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.68, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'rf_max_depth': 3, 'desc
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.7, 'W_XGB': 
+======================================================================
+
+
+==================================================
+EXPERIMENT 35/100
+Phase: 4 | Type: random
+==================================================
+
+Configuration: Random exploration: {'xgb_learning_rate': 0.03, 'desc': 'Slower learning rate (0.03)'}
+
+======================================================================
+Experiment: Random exploration: {'xgb_learning_rate': 0.03, 'desc': 'Slower learning rate (0.03)'}
+Timestamp: 2026-03-24 21:44:05
+======================================================================
+
+
+ DISCARD: 0.965431 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 35
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.68, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'rf_max_depth': 3, 'desc
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.7, 'W_XGB': 
+   [X ] 0.9654 | Random exploration: {'xgb_learning_rate': 0.0
+======================================================================
+
+
+ EARLY STOP: No improvement after 10 experiments
+
+======================================================================
+AUTONOMOUS OPTIMIZATION COMPLETE
+======================================================================
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 35
+Kept: 5
+
+ Best score: 0.965431
+   C-Index: 1.000000
+   Brier: 0.049384
+   Config: Phase 3 calibration: power=0.9
+
+ Latest 5 experiments:
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.68, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.65, 'W_XGB':
+   [X ] 0.9654 | Random exploration: {'rf_max_depth': 3, 'desc
+   [X ] 0.9654 | Random exploration: {'W_PHYS': 0.7, 'W_XGB': 
+   [X ] 0.9654 | Random exploration: {'xgb_learning_rate': 0.0
+======================================================================
+
