@@ -115,26 +115,29 @@ FEATURE_SET = [
     'v_stable',                       # Stable velocity (closing + radial growth)
     'alignment_abs',                  # Direction alignment to zone
     'area_first_ha',                  # Initial fire area
-    
+
     # ===== INTERACTION FEATURES (physics-driven) =====
     'eta_kinetic',                    # Distance / velocity ratio
     'density_metric',                 # Area / distance ratio
     'speed_alignment',                # Speed × alignment product
     'kinetic_energy',                 # Area × velocity^2
     'approach_rate',                  # Closing speed × alignment
-    
+
     # ===== DISTANCE FEATURES (high predictive power) =====
     'dist_to_initial_ratio',          # Distance ratio feature
     'dist_slope_ci_0_5h',             # Distance change rate
     'closing_speed_m_per_h',          # Direct distance closing speed
-    
+
     # ===== TEMPORAL FEATURES (circadian effects) =====
     'is_night',                       # Night vs day
     'hour_sin', 'hour_cos',           # Hour of day (circular encoding)
-    
+
     # ===== GROWTH FEATURES (fire spread) =====
     'area_growth_rel_0_5h',           # Relative growth
     'radial_growth_rate_m_per_h',     # Radial spread rate
+
+    # ===== ADDITIONAL FEATURES (test) =====
+    'lateral_motion',                 # Perpendicular motion (reduces threat)
 ]
 
 # Note: We deliberately omit some features to reduce overfitting
