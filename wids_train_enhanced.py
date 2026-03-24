@@ -27,6 +27,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
+from sklearn.isotonic import IsotonicRegression
 from xgboost import XGBClassifier
 import warnings
 warnings.filterwarnings('ignore')
@@ -50,6 +51,17 @@ W_RF = 0.05        # Random Forest (ensemble diversity)
 W_GB = 0.05        # Gradient Boosting (calibration focus)
 
 assert abs(W_PHYS + W_XGB + W_RF + W_GB - 1.0) < 0.001, "Weights must sum to 1"
+
+
+# ============================================================================
+# MODIFIABLE: Calibration Method
+# ============================================================================
+# Options: 'power' (power transform), 'isotonic' (isotonic regression)
+# Power: simple, smooth transformation
+# Isotonic: non-parametric, learns optimal calibration from CV data
+
+CALIBRATION_METHOD = 'isotonic'  # Try isotonic for better calibration
+POWER_SQUISH = 0.9  # Used when CALIBRATION_METHOD = 'power'
 
 
 # ============================================================================
@@ -272,17 +284,21 @@ def train_and_evaluate():
         
         # 1. Physics model (fixed)
         p_phys = get_physics_probs(df_val, df_train)
-        
+        p_phys_train = get_physics_probs(df_train, df_train)
+
         # 2. ML models with regularization
         p_xgb = np.zeros((len(df_val), 4))
         p_rf = np.zeros((len(df_val), 4))
         p_gb = np.zeros((len(df_val), 4))
-        
+        p_xgb_train = np.zeros((len(df_train), 4))
+        p_rf_train = np.zeros((len(df_train), 4))
+        p_gb_train = np.zeros((len(df_train), 4))
+
         feature_importance_all = {}
-        
+
         for h_idx, h in enumerate([12, 24, 48, 72]):
             y_h = ((df_train['time_to_hit_hours'] <= h) & (df_train['event'] == 1)).astype(int)
-            
+
             # ===== XGBoost (with regularization) =====
             xgb_model = XGBClassifier(
                 n_estimators=ModelParams.xgb_n_estimators,
@@ -299,7 +315,8 @@ def train_and_evaluate():
             )
             xgb_model.fit(df_train[FEATURE_SET], y_h)
             p_xgb[:, h_idx] = xgb_model.predict_proba(df_val[FEATURE_SET])[:, 1]
-            
+            p_xgb_train[:, h_idx] = xgb_model.predict_proba(df_train[FEATURE_SET])[:, 1]
+
             # ===== Random Forest (with regularization) =====
             rf_model = RandomForestClassifier(
                 n_estimators=ModelParams.rf_n_estimators,
@@ -312,7 +329,8 @@ def train_and_evaluate():
             )
             rf_model.fit(df_train[FEATURE_SET], y_h)
             p_rf[:, h_idx] = rf_model.predict_proba(df_val[FEATURE_SET])[:, 1]
-            
+            p_rf_train[:, h_idx] = rf_model.predict_proba(df_train[FEATURE_SET])[:, 1]
+
             # ===== Gradient Boosting (with regularization) =====
             gb_model = GradientBoostingClassifier(
                 n_estimators=ModelParams.gb_n_estimators,
@@ -325,12 +343,32 @@ def train_and_evaluate():
             )
             gb_model.fit(df_train[FEATURE_SET], y_h)
             p_gb[:, h_idx] = gb_model.predict_proba(df_val[FEATURE_SET])[:, 1]
+            p_gb_train[:, h_idx] = gb_model.predict_proba(df_train[FEATURE_SET])[:, 1]
         
         # 3. Ensemble blend
         probs_blend = (W_PHYS * p_phys) + (W_XGB * p_xgb) + (W_RF * p_rf) + (W_GB * p_gb)
-        
-        # 4. Calibration (power transform)
-        probs_final = np.power(probs_blend, 1.15)  # SQUISH factor - reduced for better calibration
+
+        # 4. Calibration
+        if CALIBRATION_METHOD == 'isotonic':
+            # Isotonic regression calibration (non-parametric, monotonic)
+            probs_final = np.zeros_like(probs_blend)
+
+            for h_idx, h in enumerate([12, 24, 48, 72]):
+                # Fit isotonic regressor on train fold
+                y_h_train = ((df_train['time_to_hit_hours'] <= h) & (df_train['event'] == 1)).astype(int)
+
+                # Get train predictions for calibration
+                p_train_blend_h = (W_PHYS * p_phys_train[:, h_idx]) + \
+                                  (W_XGB * p_xgb_train[:, h_idx]) + \
+                                  (W_RF * p_rf_train[:, h_idx]) + \
+                                  (W_GB * p_gb_train[:, h_idx])
+
+                ir = IsotonicRegression(out_of_bounds='clip')
+                ir.fit(p_train_blend_h, y_h_train)
+                probs_final[:, h_idx] = ir.transform(probs_blend[:, h_idx])
+        else:
+            # Power transform calibration (simple, smooth)
+            probs_final = np.power(probs_blend, POWER_SQUISH)
         
         # 5. Post-processing adjustments
         # Uncertain fires (no perimeter data)
