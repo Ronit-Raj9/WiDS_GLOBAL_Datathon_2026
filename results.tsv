@@ -9,3 +9,8 @@ exp_007	0.954222	1.0	0.065396	discard	6.6	Phase 1: Conservative ML boost
 exp_008	0.955198	1.0	0.064003	discard	7.2	Phase 1: More RF diversity
 unknown	0.956781	1.0	0.061741	discard	9.0	baseline sanity
 unknown	0.958107	1.0	0.059847	keep	8.5	auto-1
+exp_011	0.958107	1.0	0.059847	discard	6.2	Phase 2 hyperparams: xgb_max_depth=2
+exp_012	0.958107	1.0	0.059847	discard	6.6	Phase 2 hyperparams: xgb_max_depth=4
+exp_013	0.950422	1.0	0.070825	discard	7.7	Phase 2 hyperparams: xgb_min_child_weight=10
+exp_014	0.957653	1.0	0.060496	discard	7.4	Phase 2 hyperparams: xgb_learning_rate=0.03
+exp_015	0.958438	1.0	0.059374	discard	6.5	Phase 2 hyperparams: xgb_learning_rate=0.1

@@ -1,0 +1,213 @@
+Autonomous mode: False
+Max experiments: 50
+
+
+======================================================================
+WiDS AUTONOMOUS OPTIMIZATION
+======================================================================
+Max experiments: 50
+Min improvement: 0.001
+Start time: 2026-03-24 21:35:01
+======================================================================
+
+
+==================================================
+EXPERIMENT 11/50
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: xgb_max_depth=2
+
+======================================================================
+Experiment: Phase 2 hyperparams: xgb_max_depth=2
+Timestamp: 2026-03-24 21:35:01
+======================================================================
+
+
+ DISCARD: 0.958107 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 11
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9542 | Phase 1: Conservative ML boost
+   [X ] 0.9552 | Phase 1: More RF diversity
+   [X ] 0.9568 | baseline sanity
+   [OK] 0.9581 | auto-1
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=2
+======================================================================
+
+
+==================================================
+EXPERIMENT 12/50
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: xgb_max_depth=4
+
+======================================================================
+Experiment: Phase 2 hyperparams: xgb_max_depth=4
+Timestamp: 2026-03-24 21:35:10
+======================================================================
+
+
+ DISCARD: 0.958107 (+0.000000)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 12
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9552 | Phase 1: More RF diversity
+   [X ] 0.9568 | baseline sanity
+   [OK] 0.9581 | auto-1
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=2
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=4
+======================================================================
+
+
+==================================================
+EXPERIMENT 13/50
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: xgb_min_child_weight=10
+
+======================================================================
+Experiment: Phase 2 hyperparams: xgb_min_child_weight=10
+Timestamp: 2026-03-24 21:35:20
+======================================================================
+
+
+ DISCARD: 0.950422 (-0.007685)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 13
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9568 | baseline sanity
+   [OK] 0.9581 | auto-1
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=2
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=4
+   [X ] 0.9504 | Phase 2 hyperparams: xgb_min_child_weight=10
+======================================================================
+
+
+==================================================
+EXPERIMENT 14/50
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: xgb_learning_rate=0.03
+
+======================================================================
+Experiment: Phase 2 hyperparams: xgb_learning_rate=0.03
+Timestamp: 2026-03-24 21:35:31
+======================================================================
+
+
+ DISCARD: 0.957653 (-0.000454)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 14
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [OK] 0.9581 | auto-1
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=2
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=4
+   [X ] 0.9504 | Phase 2 hyperparams: xgb_min_child_weight=10
+   [X ] 0.9577 | Phase 2 hyperparams: xgb_learning_rate=0.03
+======================================================================
+
+
+==================================================
+EXPERIMENT 15/50
+Phase: 2 | Type: hyperparams
+==================================================
+
+Configuration: Phase 2 hyperparams: xgb_learning_rate=0.1
+
+======================================================================
+Experiment: Phase 2 hyperparams: xgb_learning_rate=0.1
+Timestamp: 2026-03-24 21:35:42
+======================================================================
+
+
+ DISCARD: 0.958438 (+0.000331)
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 15
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=2
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=4
+   [X ] 0.9504 | Phase 2 hyperparams: xgb_min_child_weight=10
+   [X ] 0.9577 | Phase 2 hyperparams: xgb_learning_rate=0.03
+   [X ] 0.9584 | Phase 2 hyperparams: xgb_learning_rate=0.1
+======================================================================
+
+
+ EARLY STOP: No improvement after 5 experiments
+
+======================================================================
+AUTONOMOUS OPTIMIZATION COMPLETE
+======================================================================
+
+======================================================================
+PROGRESS SUMMARY
+======================================================================
+Total experiments: 15
+Kept: 3
+
+ Best score: 0.958107
+   C-Index: 1.000000
+   Brier: 0.059847
+   Config: auto-1
+
+ Latest 5 experiments:
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=2
+   [X ] 0.9581 | Phase 2 hyperparams: xgb_max_depth=4
+   [X ] 0.9504 | Phase 2 hyperparams: xgb_min_child_weight=10
+   [X ] 0.9577 | Phase 2 hyperparams: xgb_learning_rate=0.03
+   [X ] 0.9584 | Phase 2 hyperparams: xgb_learning_rate=0.1
+======================================================================
+
